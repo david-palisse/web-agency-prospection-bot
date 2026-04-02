@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prospection commerces sans site web</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+
+      main {
+        max-width: 760px;
+        margin: 48px auto;
+        padding: 32px;
+        background: #111827;
+        border-radius: 16px;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+      }
+
+      h1 {
+        margin-top: 0;
+      }
+
+      p,
+      li {
+        line-height: 1.6;
+      }
+
+      form {
+        display: grid;
+        gap: 16px;
+        margin-top: 24px;
+      }
+
+      label {
+        font-weight: 700;
+      }
+
+      input,
+      button {
+        font-size: 16px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: none;
+      }
+
+      input {
+        background: #1f2937;
+        color: #f8fafc;
+      }
+
+      button {
+        cursor: pointer;
+        background: #22c55e;
+        color: #052e16;
+        font-weight: 700;
+      }
+
+      .result,
+      .error {
+        margin-top: 24px;
+        padding: 16px;
+        border-radius: 12px;
+      }
+
+      .result {
+        background: rgba(34, 197, 94, 0.12);
+      }
+
+      .error {
+        background: rgba(239, 68, 68, 0.12);
+      }
+
+      a {
+        color: #93c5fd;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Exporter les commerces sans site internet</h1>
+      <p>
+        Saisissez une ville, puis l'application interrogera Google Places API pour constituer un
+        fichier CSV des commerces trouvés sans site web.
+      </p>
+      <ul>
+        <li>Le CSV contient le nom, le type, l'adresse, la note, l'e-mail et le téléphone.</li>
+        <li>L'adresse e-mail est généralement absente de Google Places API : la colonne reste vide.</li>
+        <li>Les résultats dépendent de la couverture Google Places et des quotas de votre clé API.</li>
+      </ul>
+
+      <form id="prospection-form">
+        <div>
+          <label for="city">Ville</label>
+          <input id="city" name="city" type="text" placeholder="Exemple : Lyon" required />
+        </div>
+
+        <button type="submit">Générer le CSV</button>
+      </form>
+
+      <div id="feedback"></div>
+    </main>
+
+    <script>
+      const form = document.getElementById('prospection-form');
+      const feedback = document.getElementById('feedback');
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        feedback.innerHTML = '<div class="result">Recherche en cours...</div>';
+
+        const formData = new FormData(form);
+        const city = formData.get('city');
+
+        try {
+          const response = await fetch('/api/prospection/export', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ city })
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error || 'Une erreur est survenue.');
+          }
+
+          feedback.innerHTML = `
+            <div class="result">
+              <p><strong>Ville :</strong> ${data.city}</p>
+              <p><strong>Commerces analysés :</strong> ${data.scannedBusinesses}</p>
+              <p><strong>Lignes exportées :</strong> ${data.exportedBusinesses}</p>
+              <p><a href="${data.downloadUrl}" download>Télécharger le fichier CSV</a></p>
+            </div>
+          `;
+        } catch (error) {
+          feedback.innerHTML = `<div class="error">${error.message}</div>`;
+        }
+      });
+    </script>
+  </body>
+</html>

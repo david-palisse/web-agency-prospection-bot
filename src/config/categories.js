@@ -1,0 +1,22 @@
+export const SEARCH_CATEGORIES = [
+  'restaurant',
+  'salon de coiffure',
+  'magasin de vêtements',
+  'boulangerie',
+  'pharmacie',
+  'café',
+  'bar',
+  'supermarché',
+  'garage automobile',
+  'salle de sport',
+  'fleuriste',
+  'librairie',
+  'boutique de chaussures',
+  'magasin de meubles',
+  'institut de beauté',
+  'magasin d\'électronique',
+  'agence immobilière',
+  'bijouterie',
+  'animalerie',
+  'magasin bio'
+];

@@ -37,7 +37,11 @@ cp .env.example .env
 
 ```env
 GOOGLE_MAPS_API_KEY=your_google_places_api_key
+AUTH_USER=admin
+AUTH_PASS=change_me
 ```
+
+L'application est protégée par une authentification HTTP Basic. Tous les accès au site et aux endpoints API nécessitent les identifiants définis dans `.env`.
 
 ## Lancement
 
@@ -77,6 +81,7 @@ http://localhost:3000
 
 ```bash
 curl -X POST http://localhost:3000/api/prospection/export \
+  -u admin:change_me \
   -H "Content-Type: application/json" \
   -d '{"city":"Marseille"}'
 ```
